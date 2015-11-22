@@ -1,0 +1,20 @@
+[Setup]
+ETCHING = (True, 'True',"Flag, das angibt, ob isotrop geätzt werden soll")
+
+[Initial Conditions]
+XMIN   = (-50,'False',"x-Wert für den linken Rand der Oberfläche")
+XMAX   = ( 50,'False',"x-Wert für den rechten Rand der Oberfläche")
+DELTA_X= (  1,'None',"Inkrement der x-Werte in der Anfangsbedinung")
+
+INITIAL_SURFACE_TYPE = ('Cosine' ,'true',"Typ der Anfangsbedingung")
+FUN_XMIN             = (-25      ,'False',"x-Wert für den linken Rand der Cosinus Funktion")
+FUN_XMAX             = ( 25      ,'False',"x-Wert für den rechten Rand der Cosinus Funktion")
+
+[Numerics]
+TIME_STEP = (1,'None',"Zeitschrittweite")
+
+[Beam]
+TOTAL_TIME = (10,'None',"Simulationszeit")
+
+[Physics]
+ETCH_RATE = (1,'None',"Ätzrate(Oberflächengeschwindigkeit)")
