@@ -15,6 +15,15 @@ TIME_STEP = (1,'None',"Zeitschrittweite")
 
 [Beam]
 TOTAL_TIME = (10,'None',"Simulationszeit")
+BEAM_TYPE = ('constant', 'None', "Strahlprofil: 'constant', 'gaussian', 'error function'")
+BEAM_CURRENT_DENSITY = (10e-12, 'None', "Strahlstromdichte J[A/cm2] für konstante Stahlprofil")
+BEAM_CURRENT = (10e-12, 'None', "Strahlstrom I[A] für nicht-konstante Strahlprofile")
+BEAM_CENTER = (0, 'None', "Strahlmittelpunkt für nicht-konstante Strahlprofile")
+FWHM = (100e-9, 'None', "Full Width at Half Maximum für nicht-konstante Strahlprofile")
+ERF_BEAM_WIDTH = (10e-6, 'None', "Scanweite Wx für Fehlerfunktionsprofile")
+
+[Scan]
+SCAN_WIDTH = (10e-6, 'None', "Scanweite Wz für nichtkonstante Strahlprofile")
 
 [Physics]
 ETCH_RATE = (1,'None',"Ätzrate(Oberflächengeschwindigkeit)")
