@@ -17,14 +17,14 @@ def plot(fname):
         fname is the file name e.g. trench.srf
 
     - Space-bar: show next surface.
-    - '[1-9]': show every 2nth surface
+    - '[1-9]': show every 2nd surface
     - '0': show last surface
     - 'r': show first surface
     - 'a': switch plot aspect 1:1 <==> auto
     - 'c': switch between two modi, single plot, multiple plot for surfaces
     - 'f': save plot as (png-)file with the name of the xxx.srf file
     - 'b': switch between fixed axis and auto axis of new surface
-    - 'q': Quite.
+    - 'q': Quit.
     '''
     help(plot)
     global abs_filepath
@@ -103,12 +103,14 @@ def event_handler(event):
     global aspect
     global clear_figure
     global axis
+    global saveAxis
 
     if event is None:
         plot_index = 0
         aspect = 0
         clear_figure = 1
         axis = False
+        saveAxis = [-60, 60 -120, 20]
 
     else:
         if event.key in [' ']:
@@ -141,6 +143,7 @@ def event_handler(event):
 
         elif event.key in ['b']:
             axis = not axis
+            saveAxis = plt.axis()
 
         elif event.key in ['q']:
             plt.close()
@@ -158,7 +161,7 @@ def event_handler(event):
         ax.clear()
 
     if axis:
-        plt.axis([-60, 60, -120, 20])
+        plt.axis(saveAxis)#([-60, 60, -120, 20])
 
     ax.plot(x_Vals[plot_index], y_Vals[plot_index], '.r-')
     ax.set_title("Surface %i" % (plot_index+1))
