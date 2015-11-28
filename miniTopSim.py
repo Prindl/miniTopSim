@@ -92,7 +92,7 @@ def aetzen(file, t, dt, xvals, yvals):
         # Die listen werden fuer die neue Iteration vorbereitet
         xvals=xvals2[:]
         yvals=yvals2[:]
-        yvals2 = [-(j+2.0)] * 101
+        yvals2 = [-(j+2.0)] * len(yvals)
     return xvals,yvals
     
     

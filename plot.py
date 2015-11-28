@@ -161,7 +161,7 @@ def event_handler(event):
         ax.clear()
 
     if axis:
-        plt.axis(saveAxis)#([-60, 60, -120, 20])
+        plt.axis(saveAxis)
 
     ax.plot(x_Vals[plot_index], y_Vals[plot_index], '.r-')
     ax.set_title("Surface %i" % (plot_index+1))
