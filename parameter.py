@@ -105,9 +105,21 @@ def read(Datei):
                     sys.exit(error)
     PAR_IN.clear()
     
+    # Load the variables into the 'globals' namespace
+    varDict = toDict()
+    
+    for key in varDict:
+        globals()[key] = varDict[key]
+    
 def toDict():
     dictionary={}
     for section in PARAMETER:
         for key in PARAMETER[section]:
-            dictionary[key]=PARAMETER.get(section,key)
+            parType = checktypeparameter(section, key)
+            if parType == 'float':
+                dictionary[key.upper()]=PARAMETER.getfloat(section,key)
+            elif parType == 'bool':
+                dictionary[key.upper()]=PARAMETER.getboolean(section,key)
+            else:
+                dictionary[key.upper()]=PARAMETER.get(section,key)
     return dictionary

@@ -8,16 +8,18 @@ import plot
 import sys
 import csv 
 import matplotlib.pyplot as plt
+import parameter as par
 # import numpy as np
 
 
-def init_values(linke_grenzwert, rechte_grenzwert):
+def init_values(linke_grenzwert, rechte_grenzwert, delta_x):
     '''
     Diese Funktion erzeutgt zwei Listen (xvals und yvals).Die Liste xvals geht ab dem Wert(linke_grenzwert)
     bis zum Wert(rechte_grenzwert) mit der Schrittweite delta_x = 1 [nm]
     '''
-    lst = list(range(linke_grenzwert, rechte_grenzwert + 1))
-    xvals = [float(i) for i in lst]
+#   lst = list(range(int(linke_grenzwert), int(rechte_grenzwert) + 1))
+#   xvals = [float(i) for i in lst]
+    xvals = [(linke_grenzwert + delta_x * i) for i in range(int((rechte_grenzwert - linke_grenzwert) / delta_x))]
     yvals = [0.0] * len(xvals)
     for i in range(0, len(xvals)):
         if abs(xvals[i]) < 25: 
@@ -52,9 +54,9 @@ def aetzen(file, t, dt, xvals, yvals):
     wobei die Zeit t ueber die geaetzt wird und die Zeitschrittweite dt uebergegeben werden
     '''
     # Die Listen xvals2 und yvals2 nach dem aetzen werden erzeugt
-    xvals2,yvals2 = init_values(-50,50)
+    xvals2,yvals2 = init_values(par.XMIN, par.XMAX, par.DELTA_X)
     # yvals2 muss ueberschrieben werden (es wird auf allen Stellen in der Liste der Wert -dt reingeschrieben)
-    yvals2 = [float(-dt)] * 101
+    yvals2 = [float(-dt)] * len(xvals2)
     
     # t/dt - Anzahl der Aetzschritten
     for j in range(0,int(t/dt)):
@@ -114,18 +116,21 @@ def main():
     
     '''
     
-    # Falls weniger oder mehr als drei parameter uebergegeben werden,
+    # Falls weniger oder mehr als zwei parameter uebergegeben werden,
     # kommt eine Fehlermeldung die Die richtige Eingabe deutet
-    if(len(sys.argv) == 3 ):
-        t = int(sys.argv[1]) 
-        dt = int(sys.argv[2])
+    if(len(sys.argv) == 2 ):
+        configFileName = str(sys.argv[1])
     else: 
-        sys.stderr.write('Error: usage: '+ sys.argv[0] + ' <t> <dt>')
+        sys.stderr.write('Error: usage: '+ sys.argv[0] + ' <filename.cfg>')
         sys.stderr.flush()
         exit(2)
-        
+    
+    # Read the parameter file
+    par.init()
+    par.read(configFileName)
+    
     # Listen xvals und yvals werden erzeugt
-    xvals,yvals = init_values(-50,50)
+    xvals,yvals = init_values(par.XMIN, par.XMAX, par.DELTA_X)
         
     # Die Oberflaeche zum Zeipunkt t=0 wird geplotet
     # plotten(xvals,yvals,'bo-','Anfangszeitpunkt')
@@ -133,17 +138,17 @@ def main():
     # Es wird ein File erzeugt mit der Name 'basic_t_dt.srf', wobei t und dt durch 
     # die Tatsaechliche Zeit und Zeitschrittweite ersetz werden. Außerdem wird in die Datei
     # die Oberflaeche zum Zeitpunkt t=0 reingeschrieben (xvals und yvals in spalten)
-    file = open('basic_{0}_{1}.srf'.format(sys.argv[1],sys.argv[2]),"w")
+    file = open('basic_{0}_{1}.srf'.format(par.TOTAL_TIME, par.TIME_STEP),"w")
     write(file, 0 , xvals,yvals)
     
-    aetzen(file, t, dt, xvals, yvals)
+    aetzen(file, par.TOTAL_TIME, par.TIME_STEP, xvals, yvals)
     
     file.close()
     
     # Die Oberflaeche zum Endzeitpunkt wird geplotet
     # plotten(xvals,yvals,'ro-','Endzeitpunkt')
     
-    fname = 'basic_{0}_{1}.srf'.format(sys.argv[1],sys.argv[2])
+    fname = 'basic_{0}_{1}.srf'.format(par.TOTAL_TIME, par.TIME_STEP)
     plot.plot(fname)
         
     # plt.legend()
