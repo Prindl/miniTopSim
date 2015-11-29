@@ -9,6 +9,8 @@ import sys
 import csv 
 import matplotlib.pyplot as plt
 import parameter as par
+import delooping
+import time
 # import numpy as np
 
 
@@ -89,6 +91,9 @@ def aetzen(file, t, dt, xvals, yvals):
                 xvals2[i]=xvals[i]+(abn/lws)*(-1)*dt
                 yvals2[i]=yvals[i]+(acn/lws)*(-1)*dt
         
+        # Remove loops
+        xvals2, yvals2 = delooping.deloop(xvals2, yvals2)
+        
         # nach jedem Aetzschritt werden die Listen xvals2 und yvals2 in die File (basic_t_dt.srf) geschreiben
         write(file, j+dt, xvals2,yvals2)
         # Die listen werden fuer die neue Iteration vorbereitet
@@ -141,7 +146,14 @@ def main():
     file = open('basic_{0}_{1}.srf'.format(par.TOTAL_TIME, par.TIME_STEP),"w")
     write(file, 0 , xvals,yvals)
     
+    # Start time measurement
+    startTime = time.clock()
+    
     aetzen(file, par.TOTAL_TIME, par.TIME_STEP, xvals, yvals)
+    
+    # Stop time measurement and print it
+    endTime = time.clock()
+    print("Calculation Time: " + str(endTime - startTime) + " seconds")
     
     file.close()
     
