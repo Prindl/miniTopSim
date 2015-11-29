@@ -29,7 +29,8 @@ def plot(fname):
     help(plot)
     global abs_filepath
     global number_of_surfaces
-    global ax
+    global ax1
+    global ax2
     global filename
 
     filename = fname
@@ -48,7 +49,7 @@ def plot(fname):
         if number > number_of_surfaces:
             break
 
-    ax = plt.subplot(111)
+    f, (ax1, ax2) = plt.subplots(1, 2, sharey=True)
     event_handler(None)
     plt.connect('key_press_event', event_handler)
     plt.show()
@@ -153,18 +154,27 @@ def event_handler(event):
             return
 
     if aspect:
-        ax.set_aspect('equal')
+        ax1.set_aspect('equal')
+        ax2.set_aspect('equal')
     else:
-        ax.set_aspect('auto')
+        ax1.set_aspect('auto')
+        ax2.set_aspect('auto')
 
     if clear_figure:
-        ax.clear()
+        ax1.clear()
+        ax2.clear()
 
     if axis:
         plt.axis(saveAxis)
 
-    ax.plot(x_Vals[plot_index], y_Vals[plot_index], '.r-')
-    ax.set_title("Surface %i" % (plot_index+1))
+    first_plot_index = plot_index;
+    ax1.plot(x_Vals[first_plot_index], y_Vals[first_plot_index], '.r-')
+    ax1.set_title("Surface %i" % (first_plot_index+1))
+    
+    next_plot_index = (plot_index + int(len(x_Vals)/2)) % len(x_Vals)
+    ax2.plot(x_Vals[next_plot_index], y_Vals[next_plot_index], '.r-')
+    ax2.set_title("Surface %i" % (next_plot_index+1))
+
     plt.xlabel("x")
     plt.ylabel("y")
     plt.draw()

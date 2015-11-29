@@ -110,6 +110,11 @@ def read(Datei):
     
     for key in varDict:
         globals()[key] = varDict[key]
+        
+# String parameters start and end with a single quotes (e.g: 'Cosine')
+# To correctly use string parameters, we strip them out.
+def unquote_string_parameter(s):
+    return s.strip('\'')
     
 def toDict():
     dictionary={}
@@ -121,5 +126,5 @@ def toDict():
             elif parType == 'bool':
                 dictionary[key.upper()]=PARAMETER.getboolean(section,key)
             else:
-                dictionary[key.upper()]=PARAMETER.get(section,key)
+                dictionary[key.upper()]=unquote_string_parameter(PARAMETER.get(section,key))
     return dictionary

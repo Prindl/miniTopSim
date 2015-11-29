@@ -10,6 +10,8 @@ DELTA_X= (  1,'None',"Inkrement der x-Werte in der Anfangsbedinung")
 INITIAL_SURFACE_TYPE = ('Cosine' ,'True',"Typ der Anfangsbedingung")
 FUN_XMIN             = (-25      ,'False',"x-Wert für den linken Rand der Cosinus Funktion")
 FUN_XMAX             = ( 25      ,'False',"x-Wert für den rechten Rand der Cosinus Funktion")
+INITIAL_SURFACE_FILE = ('FuncCosine.srf','True',"Filename des srf-Files die eingelesenden werden")
+FUN_PEAK_TO_PEAK     = (0		 ,'True',"Maximale Auslenkung der Funktion in Bezug")
 
 [Numerics]
 TIME_STEP = (1,'None',"Zeitschrittweite")
