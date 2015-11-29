@@ -55,12 +55,13 @@ def init_values(linke_grenzwert, rechte_grenzwert, delta_x):
     func = get_func_delegate(par.INITIAL_SURFACE_TYPE)
     func_xmin = par.FUN_XMIN
     func_xmax = par.FUN_XMAX
+    func_period = func_xmax - func_xmin
     func_amplitude = par.FUN_PEAK_TO_PEAK
         
     for i in range(0, len(xvals)):
         x = xvals[i]
         if func_xmin <= x and x <= func_xmax:
-            yvals[i] = func_amplitude*(1 + func(x*2*math.pi/50)) # Dies wurde in der Angabe definiert
+            yvals[i] = func_amplitude*(1 + func(x*2*math.pi/func_period)) # Dies wurde in der Angabe definiert
         else:
             continue
     return xvals, yvals
