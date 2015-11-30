@@ -1,6 +1,7 @@
 [Setup]
-ETCHING = (False, 'True',"Flag, das angibt, ob isotrop geätzt werden soll")
-NUMPY = (False, 'True',"Flag, das angibt ob in zeitkritischen Bereichen NumPy-Arrays verwendet werden sollen")
+ETCHING = (True, 'True',"Flag, das angibt, ob isotrop geätzt werden soll")
+NUMPY = (True, 'True',"Flag, das angibt ob in zeitkritischen Bereichen NumPy-Arrays verwendet werden sollen")
+
 
 [Initial Conditions]
 XMIN   = (-50,'False',"x-Wert für den linken Rand der Oberfläche")
@@ -10,13 +11,14 @@ DELTA_X= (  1,'None',"Inkrement der x-Werte in der Anfangsbedinung")
 INITIAL_SURFACE_TYPE = ('Cosine' ,'True',"Typ der Anfangsbedingung")
 FUN_XMIN             = (-25      ,'False',"x-Wert für den linken Rand der Cosinus Funktion")
 FUN_XMAX             = ( 25      ,'False',"x-Wert für den rechten Rand der Cosinus Funktion")
+INITIAL_SURFACE_FILE = ('FuncCosine.srf','True',"Filename des srf-Files die eingelesenden werden")
+FUN_PEAK_TO_PEAK     = (0		 ,'True',"Maximale Auslenkung der Funktion in Bezug")
 
 [Numerics]
 TIME_STEP = (1,'None',"Zeitschrittweite")
 
 [Beam]
 TOTAL_TIME = (10,'None',"Simulationszeit")
-
 BEAM_TYPE = ('constant', 'None', "Strahlprofil: 'constant', 'gaussian', 'error function'")
 BEAM_CURRENT_DENSITY = (10e-12, 'None', "Strahlstromdichte J[A/cm2] für konstante Stahlprofil")
 BEAM_CURRENT = (10e-12, 'None', "Strahlstrom I[A] für nicht-konstante Strahlprofile")

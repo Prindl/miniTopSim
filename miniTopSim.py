@@ -13,23 +13,73 @@ import csv
 import numpy as np
 import scipy.constants
 import parameter as par
+import delooping
+import time
+# import numpy as np
 
+
+# Creates a delegate (function pointer) for given function type.
+# For ease of implementation, it constructs a lambda function for it's return value.
+def get_func_delegate(type):
+    upper_type = type.upper();    
+
+    if upper_type == 'COSINE':
+        return lambda x: math.cos(x)
+        
+    if upper_type == 'DOUBLECOSINE':
+        return lambda x: math.cos(x*2+math.pi)
+
+    # We define step function as ternary function like:
+    # f(x) = (x >= 0) ? 1 : 0
+    # For making compliant with previous calculations,
+    # we modify the step function to generate [-1, +1] for [-PI, +PI] inputs
+    if upper_type == 'STEP':
+        return lambda x: 2*(1 if x >= 0 else 0)-1
+
+    # We define V-shape as triangle function which is defined as follow:
+    # f(x) = |x|
+    # For making compliant with previous calculations,
+    # we modify the V-shape function to generate [-1, +1] for [-PI, +PI] inputs
+    if upper_type == 'V-SHAPE' or upper_type == 'VSHAPE':
+        return lambda x: -2*abs(x / math.pi)+1
+
+    # For undefined types, return identity function
+    return lambda x: x
 
 def init_values(linker_grenzwert, rechter_grenzwert, delta_x):
     '''
     Diese Funktion erzeutgt zwei Numpy-Arrays (xvals und yvals).xvals geht ab dem Wert(linker_grenzwert)
     bis zum Wert(rechter_grenzwert) mit der Schrittweite delta_x
     '''
+
     xvals = np.linspace(linker_grenzwert,rechter_grenzwert, round((rechter_grenzwert-linker_grenzwert)/delta_x)+1)
     mask = np.less(np.abs(xvals),25)
     yvals = -50*(1 + np.cos(xvals*2*math.pi/50)) # Dies wurde in der Angabe definiert
     yvals = yvals*mask
-    return xvals, yvals   
 
+#    func = get_func_delegate(par.INITIAL_SURFACE_TYPE)
+#    func_xmin = par.FUN_XMIN
+#    func_xmax = par.FUN_XMAX
+#    func_period = func_xmax - func_xmin
+#    func_amplitude = par.FUN_PEAK_TO_PEAK
+        
+#    for i in range(0, len(xvals)):
+#        x = xvals[i]
+#        if func_xmin <= x and x <= func_xmax:
+#            yvals[i] = func_amplitude*(1 + func(x*2*math.pi/func_period)) # Dies wurde in der Angabe definiert
+#        else:
+#            continue
+    return xvals, yvals
     
 def write(file, zeitpunkt, xvals, yvals):
     '''
     Diese Funktion schreibt ins eine Datei den Zeitpunkt, Anzahl der Punkte und die x- und y- Koordinaten
+    Format:
+    surface: time, npoints, x-positions y-positions
+    x[0] y[0]
+    x[1] y[1]
+    ...
+    x[npoints-1] y[npoints-1]
     '''
     file.writelines('surface: {0}, {1}, x-points y-points \n'.format(zeitpunkt, len(xvals)))
     writer = csv.writer(file, lineterminator='\n', delimiter=' ')
@@ -176,44 +226,56 @@ def SurfaceProcess(t,dt,xvals,yvals,file=None):
             
         if file != None:
             write(file,i*dt,xvals,yvals)
+        
+        if not par.NUMPY:
+            xvals=list(xvals) #Umwandlung da delopping ein Liste für korrekte Funktion
+            yvals=list(yvals) #braucht, wenn par.NUMPY=False
+        
+        xvals,yvals = delooping.deloop(xvals,yvals)
             
     return xvals,yvals
 def main():
     '''
     Die Parameter werden beim Aufruf aus dem config-File abgerufen
     usage: >> miniTopSim.py <ConfigFile>
-    
-    Außerdem werden die Koordinaten in eine Datei geschrieben in dem Format:
-    surface: time, npoints, x-positions y-positions
-    x[0] y[0]
-    x[1] y[1]
-    ...
-    x[npoints-1] y[npoints-1]
-    
-    '''  
+    '''
     # for UnboundLocalError, we've to define configFileName variable 
     configFileName = '' 
+        
+    if(len(sys.argv) == 2 ):
+        configFileName = str(sys.argv[1])
+    else: 
+        sys.stderr.write('Error: usage: '+ sys.argv[0] + ' <filename.cfg>')
+        sys.stderr.flush()
+        exit(2)
     
-    if(len(sys.argv) == 2 ): 
-        configFileName = str(sys.argv[1]) 
-    else:  
-        sys.stderr.write('Error: usage: '+ sys.argv[0] + ' <filename.cfg>') 
-        sys.stderr.flush() 
-        exit(2) 
+    # Read the parameter file
+    par.init()
+    par.read(configFileName)
     
-    # Read the parameter file 
-    par.init() 
-    par.read(configFileName) 
-    # Arrays xvals und yvals werden erzeugt
+    # Listen xvals und yvals werden erzeugt
     xvals,yvals = init_values(par.XMIN, par.XMAX, par.DELTA_X)
+        
+    # Die Oberflaeche zum Zeipunkt t=0 wird geplotet
+    # plotten(xvals,yvals,'bo-','Anfangszeitpunkt')
     
-    fname = 'basic_{0}_{1}.srf'.format(par.TOTAL_TIME,par.TIME_STEP)
-    with open(fname.format(par.TOTAL_TIME,par.TIME_STEP),"w") as file:
+    # Es wird ein File erzeugt mit der Name 'basic_t_dt.srf', wobei t und dt durch 
+    # die Tatsaechliche Zeit und Zeitschrittweite ersetz werden. Außerdem wird in die Datei
+    # die Oberflaeche zum Zeitpunkt t=0 reingeschrieben (xvals und yvals in spalten)
+    surfaceFileName = par.INITIAL_SURFACE_FILE
+   
+    with open(surfaceFileName,"w") as file:
         #Werte zum Zeitpunkt t=0
         write(file, 0 , xvals,yvals)
+        # Start time measurement
+        startTime = time.clock()
         SurfaceProcess(par.TOTAL_TIME,par.TIME_STEP,xvals,yvals,file)
+        # Stop time measurement and print it
+        endTime = time.clock()
+        print("Calculation Time: " + str(endTime - startTime) + " seconds")
         
-    plot.plot(fname)
+    plot.plot(surfaceFileName)
         
 if __name__ == '__main__':
     main()  
+
