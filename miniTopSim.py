@@ -15,8 +15,6 @@ import scipy.constants
 import parameter as par
 import delooping
 import time
-# import numpy as np
-
 
 # Creates a delegate (function pointer) for given function type.
 # For ease of implementation, it constructs a lambda function for it's return value.
@@ -46,29 +44,28 @@ def get_func_delegate(type):
     # For undefined types, return identity function
     return lambda x: x
 
-def init_values(linker_grenzwert, rechter_grenzwert, delta_x):
+def init_values():
     '''
-    Diese Funktion erzeutgt zwei Numpy-Arrays (xvals und yvals).xvals geht ab dem Wert(linker_grenzwert)
-    bis zum Wert(rechter_grenzwert) mit der Schrittweite delta_x
+    Diese Funktion erzeutgt zwei Numpy-Arrays (xvals und yvals).
+    Das Intervall geht von XMIN bis XMAX und enthaelt die Randpunkte.
+    XMIN,XMAX Parameter im ConfigFile
     '''
-
-    xvals = np.linspace(linker_grenzwert,rechter_grenzwert, round((rechter_grenzwert-linker_grenzwert)/delta_x)+1)
-    mask = np.less(np.abs(xvals),25)
-    yvals = -50*(1 + np.cos(xvals*2*math.pi/50)) # Dies wurde in der Angabe definiert
-    yvals = yvals*mask
-
-#    func = get_func_delegate(par.INITIAL_SURFACE_TYPE)
-#    func_xmin = par.FUN_XMIN
-#    func_xmax = par.FUN_XMAX
-#    func_period = func_xmax - func_xmin
-#    func_amplitude = par.FUN_PEAK_TO_PEAK
+    func_xmin=par.XMIN
+    func_xmax=par.XMAX
+    delta_x=par.DELTA_X
+    xvals = np.linspace(func_xmin,func_xmax, round((func_xmax-func_xmin)/delta_x)+1)
+    yvals = np.zeros_like(xvals)
+    
+    func = get_func_delegate(par.INITIAL_SURFACE_TYPE)
+    func_period = func_xmax - func_xmin
+    func_amplitude = par.FUN_PEAK_TO_PEAK
         
-#    for i in range(0, len(xvals)):
-#        x = xvals[i]
-#        if func_xmin <= x and x <= func_xmax:
-#            yvals[i] = func_amplitude*(1 + func(x*2*math.pi/func_period)) # Dies wurde in der Angabe definiert
-#        else:
-#            continue
+    for i in range(0, len(xvals)):
+        x = xvals[i]
+        if func_xmin <= x and x <= func_xmax:
+            yvals[i] = func_amplitude*(1 + func(x*2*math.pi/func_period)) # Dies wurde in der Angabe definiert
+        else:
+            continue
     return xvals, yvals
     
 def write(file, zeitpunkt, xvals, yvals):
@@ -131,16 +128,12 @@ def symmetrals(xvals,yvals,AP=[0,-1],EP=[0,-1]):
     yv1=y1-y0
     yv2=y2-y1
 
-    #Berechung des Normalvektors des ersten Kurvenstsegments
     l1=np.sqrt(xv1**2+yv1**2)
-    l1=l1+np.equal(l1,0) #Verhinderung von div-by-zero
-    
+    #Berechung des Normalvektors des ersten Kurvenstsegments
     xn1=yv1/l1
     yn1=-xv1/l1
     
-    l2=np.sqrt(xv2**2+yv2**2)
-    l2=l2+np.equal(l2,0) #Verhinderung von div-by-zero
-    
+    l2=np.sqrt(xv2**2+yv2**2)    
     #Normalvektor des zweiten Kurvensegments
     xn2=yv2/l2
     yn2=-xv2/l2
@@ -150,19 +143,16 @@ def symmetrals(xvals,yvals,AP=[0,-1],EP=[0,-1]):
     
     #Berechnung der Winkelsymmetralen-Vektoren
     lsym=np.sqrt(xsym**2+ysym**2)
-    lsym=lsym+np.equal(lsym,0)
 
     xsymn=xsym/lsym
     ysymn=ysym/lsym
     
-    if AP != None:
-        xsymn=np.insert(xsymn,0,AP[0])
-        ysymn=np.insert(ysymn,0,AP[1])
+    xsymn=np.insert(xsymn,0,AP[0])
+    ysymn=np.insert(ysymn,0,AP[1])
         
-    if EP != None:
-        xsymn=np.append(xsymn,EP[0])
-        ysymn=np.append(ysymn,EP[1])
-    
+    xsymn=np.append(xsymn,EP[0])
+    ysymn=np.append(ysymn,EP[1])
+
     return xsymn,ysymn
     
 def MovePointsByDirection(xvals,yvals,xs,ys,ds):
@@ -190,30 +180,33 @@ def SputterVelocity(xs,ys):
     Berechnet die Normalengeschwindigkeit beim Sputtern.
     Parameter:
     xs, ys Normalenrichtung der Oberfläche
-    Fbeam Strahlstromdicht [Atome/(cm^2*s)] -> aus ConfigFile
-    Y0, f, b Parameter des Sputter Yields -> aus ConfigFile
-    N Atomdichte des Materials [Atome/cm^3] -> aus Configfile
+    
+    Fbeam Strahlstromdicht [Atome/(cm^2*s)] aus ConfigFile
+    N Atomdichte des Materials [Atome/cm^3] aus Configfile
+    
     Ausgabe:
-    vn Normalengeschwindigkeit [nm]
+    vn Normalengeschwindigkeit [nm/s]
     '''
     Fbeam = par.BEAM_CURRENT_DENSITY/scipy.constants.e
     N = par.DENSITY
     Xspu=0; Yspu=-1 #Sputterrichtung: feste Werte aus Angabe
-    cos_theta = (Xspu*xs + Yspu*ys)
+    cos_theta = Xspu*xs + Yspu*ys
     Fsput = Fbeam *SputterYield(cos_theta)*cos_theta
     vn=Fsput/N*1e7 #1e7 Umrechnung cm -> nm
     return vn
 
-def SurfaceProcess(t,dt,xvals,yvals,file=None):
+def SurfaceProcess(xvals,yvals,file=None):
     '''
     Fuehrt abhaengig von par.ETCHING eine Bearbeitung der Oberfläche durch.
     par.ETCHING = True -> Aetzen
     par.ETCHING = False-> Sputtern
-    t Gesamtzeit
-    dt Zeitintervall für Berechnungsschritt
+    xvals, yvals Punkte des Kurvenzuges
     file Wenn ein File angegeben wird, wird der Fortschritt nach jedem Druchlauf in eine
     Datei geschrieben
     '''
+    t=par.TOTAL_TIME
+    dt=par.TIME_STEP
+    
     for i in range(1,round(t/dt)+1):
         xs,ys = symmetrals(xvals,yvals)
         
@@ -223,25 +216,27 @@ def SurfaceProcess(t,dt,xvals,yvals,file=None):
             vn=SputterVelocity(xs,ys)
             
         xvals,yvals=MovePointsByDirection(xvals,yvals,xs,ys,vn*dt)
-            
+        
+        if not par.NUMPY:
+            #Umwandlung da delopping ein Liste für korrekte Funktion braucht, wenn par.NUMPY=False
+            xlist=list(xvals)
+            ylist=list(yvals)
+            xlist,ylist = delooping.deloop(xlist,ylist)
+            xvals=np.array(xlist)
+            yvals=np.array(ylist)
+        else:
+            xvals,yvals=delooping.deloop(xvals,yvals)
+        
         if file != None:
             write(file,i*dt,xvals,yvals)
         
-        if not par.NUMPY:
-            xvals=list(xvals) #Umwandlung da delopping ein Liste für korrekte Funktion
-            yvals=list(yvals) #braucht, wenn par.NUMPY=False
-        
-        xvals,yvals = delooping.deloop(xvals,yvals)
-            
     return xvals,yvals
+    
 def main():
     '''
     Die Parameter werden beim Aufruf aus dem config-File abgerufen
     usage: >> miniTopSim.py <ConfigFile>
-    '''
-    # for UnboundLocalError, we've to define configFileName variable 
-    configFileName = '' 
-        
+    '''  
     if(len(sys.argv) == 2 ):
         configFileName = str(sys.argv[1])
     else: 
@@ -254,27 +249,19 @@ def main():
     par.read(configFileName)
     
     # Listen xvals und yvals werden erzeugt
-    xvals,yvals = init_values(par.XMIN, par.XMAX, par.DELTA_X)
-        
-    # Die Oberflaeche zum Zeipunkt t=0 wird geplotet
-    # plotten(xvals,yvals,'bo-','Anfangszeitpunkt')
-    
-    # Es wird ein File erzeugt mit der Name 'basic_t_dt.srf', wobei t und dt durch 
-    # die Tatsaechliche Zeit und Zeitschrittweite ersetz werden. Außerdem wird in die Datei
-    # die Oberflaeche zum Zeitpunkt t=0 reingeschrieben (xvals und yvals in spalten)
-    surfaceFileName = par.INITIAL_SURFACE_FILE
+    xvals,yvals = init_values()
    
-    with open(surfaceFileName,"w") as file:
+    with open(par.INITIAL_SURFACE_FILE,"w") as file:
         #Werte zum Zeitpunkt t=0
         write(file, 0 , xvals,yvals)
         # Start time measurement
         startTime = time.clock()
-        SurfaceProcess(par.TOTAL_TIME,par.TIME_STEP,xvals,yvals,file)
+        SurfaceProcess(xvals,yvals,file)
         # Stop time measurement and print it
         endTime = time.clock()
         print("Calculation Time: " + str(endTime - startTime) + " seconds")
         
-    plot.plot(surfaceFileName)
+    plot.plot(par.INITIAL_SURFACE_FILE)
         
 if __name__ == '__main__':
     main()  

@@ -7,14 +7,15 @@ import matplotlib.pyplot as plt
 x_Vals = list()
 y_Vals = list()
 
-def plot(fname):
+def plot(fname,multiview=False):
 
     '''
     Plotten der Oberflaeche:
 
-    plot(fname)
+    plot(fname,multiview=False)
 
         fname is the file name e.g. trench.srf
+        multiview: True: Two plotfields side by side; False: One single plotfield
 
     - Space-bar: show next surface.
     - '[1-9]': show every 2nd surface
@@ -32,8 +33,10 @@ def plot(fname):
     global ax1
     global ax2
     global filename
+    global multi
 
     filename = fname
+    multi = multiview
     abs_filepath = get_filepath(fname)
     count_surfaces()
 
@@ -49,7 +52,10 @@ def plot(fname):
         if number > number_of_surfaces:
             break
 
-    f, (ax1, ax2) = plt.subplots(1, 2, sharey=True)
+    if multi:
+        f, (ax1, ax2) = plt.subplots(1, 2, sharey=True)
+    else:
+        ax1 = plt.subplot(111)
     event_handler(None)
     plt.connect('key_press_event', event_handler)
     plt.show()
@@ -155,14 +161,17 @@ def event_handler(event):
 
     if aspect:
         ax1.set_aspect('equal')
-        ax2.set_aspect('equal')
+        if multi:
+            ax2.set_aspect('equal')
     else:
         ax1.set_aspect('auto')
-        ax2.set_aspect('auto')
+        if multi:
+            ax2.set_aspect('auto')
 
     if clear_figure:
         ax1.clear()
-        ax2.clear()
+        if multi:
+            ax2.clear()
 
     if axis:
         plt.axis(saveAxis)
@@ -171,9 +180,10 @@ def event_handler(event):
     ax1.plot(x_Vals[first_plot_index], y_Vals[first_plot_index], '.r-')
     ax1.set_title("Surface %i" % (first_plot_index+1))
     
-    next_plot_index = (plot_index + int(len(x_Vals)/2)) % len(x_Vals)
-    ax2.plot(x_Vals[next_plot_index], y_Vals[next_plot_index], '.r-')
-    ax2.set_title("Surface %i" % (next_plot_index+1))
+    if multi:    
+        next_plot_index = (plot_index + int(len(x_Vals)/2)) % len(x_Vals)
+        ax2.plot(x_Vals[next_plot_index], y_Vals[next_plot_index], '.r-')
+        ax2.set_title("Surface %i" % (next_plot_index+1))
 
     plt.xlabel("x")
     plt.ylabel("y")
