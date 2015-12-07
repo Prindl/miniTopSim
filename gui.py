@@ -248,8 +248,13 @@ class main:
                 paramName = item[0].upper()
                 typ = IOParameter.checktypeparameter(sectionName,item[0])
                 if typ == 'string':
-                    typ = 'str'
-                paramValue = (locate(typ))(item[1])
+                    paramValue = str(item[1])
+                elif typ == 'float':
+                    paramValue = float(item[1])                    
+                elif typ == 'bool':
+                    paramValue = str(item[1]) in ["True","true","TRUE"]
+                else:
+                    paramValue = None   
                 paramComment = COMMENT.get(sectionName,item[0])
                 paramCondition = CONDITION.get(sectionName,item[0])
                 #print(paramName + " \t \t " + str(paramValue) + " \t "  +  type(paramValue).__name__  +  " \t " + paramComment + " \t " + paramCondition)
