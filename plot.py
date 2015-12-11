@@ -7,32 +7,36 @@ import matplotlib.pyplot as plt
 x_Vals = list()
 y_Vals = list()
 
-def plot(fname):
+def plot(fname,multiview=False):
 
     '''
     Plotten der Oberflaeche:
 
-    plot(fname)
+    plot(fname,multiview=False)
 
         fname is the file name e.g. trench.srf
+        multiview: True: Two plotfields side by side; False: One single plotfield
 
     - Space-bar: show next surface.
-    - '[1-9]': show every 2nth surface
+    - '[1-9]': show every 2nd surface
     - '0': show last surface
     - 'r': show first surface
     - 'a': switch plot aspect 1:1 <==> auto
     - 'c': switch between two modi, single plot, multiple plot for surfaces
     - 'f': save plot as (png-)file with the name of the xxx.srf file
     - 'b': switch between fixed axis and auto axis of new surface
-    - 'q': Quite.
+    - 'q': Quit.
     '''
     help(plot)
     global abs_filepath
     global number_of_surfaces
-    global ax
+    global ax1
+    global ax2
     global filename
+    global multi
 
     filename = fname
+    multi = multiview
     abs_filepath = get_filepath(fname)
     count_surfaces()
 
@@ -48,7 +52,10 @@ def plot(fname):
         if number > number_of_surfaces:
             break
 
-    ax = plt.subplot(111)
+    if multi:
+        f, (ax1, ax2) = plt.subplots(1, 2, sharey=True)
+    else:
+        ax1 = plt.subplot(111)
     event_handler(None)
     plt.connect('key_press_event', event_handler)
     plt.show()
@@ -103,12 +110,14 @@ def event_handler(event):
     global aspect
     global clear_figure
     global axis
+    global saveAxis
 
     if event is None:
         plot_index = 0
         aspect = 0
         clear_figure = 1
         axis = False
+        saveAxis = [-60, 60 -120, 20]
 
     else:
         if event.key in [' ']:
@@ -141,6 +150,7 @@ def event_handler(event):
 
         elif event.key in ['b']:
             axis = not axis
+            saveAxis = plt.axis()
 
         elif event.key in ['q']:
             plt.close()
@@ -150,18 +160,31 @@ def event_handler(event):
             return
 
     if aspect:
-        ax.set_aspect('equal')
+        ax1.set_aspect('equal')
+        if multi:
+            ax2.set_aspect('equal')
     else:
-        ax.set_aspect('auto')
+        ax1.set_aspect('auto')
+        if multi:
+            ax2.set_aspect('auto')
 
     if clear_figure:
-        ax.clear()
+        ax1.clear()
+        if multi:
+            ax2.clear()
 
     if axis:
-        plt.axis([-60, 60, -120, 20])
+        plt.axis(saveAxis)
 
-    ax.plot(x_Vals[plot_index], y_Vals[plot_index], '.r-')
-    ax.set_title("Surface %i" % (plot_index+1))
+    first_plot_index = plot_index;
+    ax1.plot(x_Vals[first_plot_index], y_Vals[first_plot_index], '.r-')
+    ax1.set_title("Surface %i" % (first_plot_index+1))
+    
+    if multi:    
+        next_plot_index = (plot_index + int(len(x_Vals)/2)) % len(x_Vals)
+        ax2.plot(x_Vals[next_plot_index], y_Vals[next_plot_index], '.r-')
+        ax2.set_title("Surface %i" % (next_plot_index+1))
+
     plt.xlabel("x")
     plt.ylabel("y")
     plt.draw()

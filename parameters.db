@@ -1,14 +1,18 @@
 [Setup]
 ETCHING = (True, 'True',"Flag, das angibt, ob isotrop geätzt werden soll")
+NUMPY = (True, 'True',"Flag, das angibt ob in zeitkritischen Bereichen NumPy-Arrays verwendet werden sollen")
+
 
 [Initial Conditions]
 XMIN   = (-50,'False',"x-Wert für den linken Rand der Oberfläche")
 XMAX   = ( 50,'False',"x-Wert für den rechten Rand der Oberfläche")
 DELTA_X= (  1,'None',"Inkrement der x-Werte in der Anfangsbedinung")
 
-INITIAL_SURFACE_TYPE = ('Cosine' ,'true',"Typ der Anfangsbedingung")
+INITIAL_SURFACE_TYPE = ('Cosine' ,'True',"Typ der Anfangsbedingung")
 FUN_XMIN             = (-25      ,'False',"x-Wert für den linken Rand der Cosinus Funktion")
 FUN_XMAX             = ( 25      ,'False',"x-Wert für den rechten Rand der Cosinus Funktion")
+INITIAL_SURFACE_FILE = ('FuncCosine.srf','True',"Filename des srf-Files die eingelesenden werden")
+FUN_PEAK_TO_PEAK     = (0		 ,'True',"Maximale Auslenkung der Funktion in Bezug")
 
 [Numerics]
 TIME_STEP = (1,'None',"Zeitschrittweite")
@@ -26,4 +30,8 @@ ERF_BEAM_WIDTH = (10e-6, 'None', "Scanweite Wx für Fehlerfunktionsprofile")
 SCAN_WIDTH = (10e-6, 'None', "Scanweite Wz für nichtkonstante Strahlprofile")
 
 [Physics]
-ETCH_RATE = (1,'None',"Ätzrate(Oberflächengeschwindigkeit)")
+ETCH_RATE = (1,'None',"Ätzrate(Oberflächengeschwindigkeit)[nm/s]")
+SPUTTER_YIELD_0 = (0.11,'None',"Y0")
+SPUTTER_YIELD_F = (1.9,'None',"f")
+SPUTTER_YIELD_B = (0.19,'None',"b")
+DENSITY =(5e22,'None',"Atomdichte [A/cm^2]")
