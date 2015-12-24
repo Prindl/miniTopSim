@@ -53,10 +53,13 @@ def gaussian_beam(xvals):
         beam.append( ((par.BEAM_CURRENT/constants.e)/(math.sqrt(2*constants.pi) * sigma_by_fwhm() * par.SCAN_WIDTH)) * math.exp(-((x - par.BEAM_CENTER)**2)/(2*(sigma_by_fwhm()**2))) )
     return beam    
     
-def erf_beam(x):
+def erf_beam(xvals):
+    beam= []
     x1 = par.BEAM_CENTER - par.ERF_BEAM_WIDTH/2
     x2 = par.BEAM_CENTER + par.ERF_BEAM_WIDTH/2
-    return ((par.BEAM_CURRENT/constants.e)/(2*par.SCAN_WIDTH*par.ERF_BEAM_WIDTH)) *(math.erf(-(x-x2)/(math.sqrt(2) * sigma_by_fwhm())) - math.erf(-(x-x1)/(math.sqrt(2) * sigma_by_fwhm())))
-
+    for x in xvals:
+        beam.append(((par.BEAM_CURRENT/constants.e)/(2*par.SCAN_WIDTH*par.ERF_BEAM_WIDTH)) *(math.erf(-(x-x2)/(math.sqrt(2) * sigma_by_fwhm())) - math.erf(-(x-x1)/(math.sqrt(2) * sigma_by_fwhm()))) )
+    return beam
+    
 def homogenous_beam():
     return par.BEAM_CURRENT_DENSITY/constants.e
