@@ -51,7 +51,6 @@ def adapt(surface, interpolation_type="linear"):
             #Entferne Knoten falls Länge von linken zu rechten Nachbarn zu kurz und Winkelkriterium nicht verletzt wird
             #Hier können noch keine Dublikate existieren da diese erst nach der Schleife in der wir uns jetzt befinden
             #eingefügt werden
-            print(i,len(xlist), len(ylist), len(xslist), len(yslist))
             if checkDistanceSmallerMAX((xlist[i-1], ylist[i-1]), (xlist[i+1], ylist[i+1]), tolerance):
                 if i < (len(xlist) - 2):
                     check1 = checkAngleCriterium([xlist[i-1], xlist[i+1], xlist[i+2]], [ylist[i-1], ylist[i+1], ylist[i+2]], [xslist[i-1], xslist[i+1], xslist[i+2]], [yslist[i-1], yslist[i+1], yslist[i+2]])
