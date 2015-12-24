@@ -24,7 +24,7 @@ class surface:
     
     """
     
-    def __init__(self, Test = False):
+    def __init__(self):
         interval_start = par.XMIN
         interval_end = par.XMAX
         period = interval_start - interval_end
@@ -139,7 +139,7 @@ class surface:
         par.ETCHING = False-> Sputtern
 
         When a file is specified, the process is written to a file after each step.
-        >>>surface.process(time)
+        >>>surface.process(time, step)
         '''
                 
         if par.ETCHING:
