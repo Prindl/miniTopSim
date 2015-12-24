@@ -16,6 +16,9 @@ FUN_PEAK_TO_PEAK     = (0		 ,'True',"Maximale Auslenkung der Funktion in Bezug")
 
 [Numerics]
 TIME_STEP = (1,'None',"Zeitschrittweite")
+ADAPTIVE_GRID = (True, 'True', "Flag, das angibt ob das Gitter adaptiert werden soll")
+MAX_SEGLEN = (10., 'None', "Maximaler Abstand benachbarter Knoten")
+MAX_ANGLE = (10, 'None', "Maximaler Winkel zwischen benachbarten Oberflächenormalen in Grad")
 
 [Beam]
 TOTAL_TIME = (10,'None',"Simulationszeit")
