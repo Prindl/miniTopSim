@@ -39,8 +39,8 @@ def main():
             
             while time <= total_time:
                 surface.process(time, dt)
-                time += dt
                 surface.write(file, time * dt)
+                time += dt
         plot = Plot(surface.get_surfaceFile())
         plot.plot()
         
