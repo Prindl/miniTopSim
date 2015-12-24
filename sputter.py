@@ -8,7 +8,7 @@ import parameter as par
 import numpy as np
 from beam import get_beam
 
-def sputterYield(self, cos_theta):
+def sputterYield(cos_theta):
     '''
     Calculates the SputterYield for a given angle with the parameters specified in the config file.
     
