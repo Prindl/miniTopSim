@@ -3,18 +3,15 @@
 This module implements three variants of ion beams.
 Beam type depends on parameter read from config file:
 [BEAM] BEAM_TYPE
-
 constant: homogen beam
 parameter:
     -[BEAM] BEAM_CURRENT_DENSITY
-
 gaussian: beam is presented by gaussian distrubution
 parameter:
     -[BEAM] BEAM_CURRENT
     -[BEAM] SCAN_WIDTH
     -[BEAM] BEAM_CENTER
     -[BEAM] FWHM
-
 error_function: approximation of gaussian beam by two error functions
 parameter:
     -[BEAM] BEAM_CURRENT
@@ -36,7 +33,6 @@ module beam.py implements these methods:
 #math implements basic math functions: exp(), sqrt(), ln(), erf(),...
 import scipy.constants as constants
 import math
-import numpy
 import parameter as loadparameterfile
 
 #create global variables of parameters to be read in
@@ -63,13 +59,13 @@ def init():
     global ERF_BEAM_WIDTH
     global BEAM_TYPE
     
-    BEAM_CURRENT_DENSITY = float(parameterdict['beam_current_density'])
-    FWHM = float(parameterdict['fwhm'])
-    SCAN_WIDTH = float(parameterdict['scan_width'])
-    BEAM_CURRENT = float(parameterdict['beam_current'])
-    BEAM_CENTER = float(parameterdict['beam_center'])
-    ERF_BEAM_WIDTH = float(parameterdict['erf_beam_width'])
-    BEAM_TYPE = str(parameterdict['beam_type'])
+    BEAM_CURRENT_DENSITY = float(parameterdict['BEAM_CURRENT_DENSITY'])
+    FWHM = float(parameterdict['FWHM'])
+    SCAN_WIDTH = float(parameterdict['SCAN_WIDTH'])
+    BEAM_CURRENT = float(parameterdict['BEAM_CURRENT'])
+    BEAM_CENTER = float(parameterdict['BEAM_CENTER'])
+    ERF_BEAM_WIDTH = float(parameterdict['ERF_BEAM_WIDTH'])
+    BEAM_TYPE = str(parameterdict['BEAM_TYPE'])
 
 def sigma_by_fwhm():
     return FWHM/(math.sqrt(8 * math.log(2)))
