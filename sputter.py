@@ -37,9 +37,5 @@ def sputterVelocity(surface):
     Xspu = 0; Yspu = -1 #Sputterrichtung: feste Werte aus Angabe
     cos_theta = Xspu * surface.xs + Yspu * surface.ys
     Fsput = Fbeam * sputterYield(cos_theta) * cos_theta
-    try:
-        vn = Fsput / N * 1e7 #1e7 Umrechnung cm -> nm
-    except ZeroDivisonError as ZDE:
-        print(ZDE.args) 
-        return []
+    vn = Fsput / N * 1e7 #1e7 Umrechnung cm -> nm
     return vn
