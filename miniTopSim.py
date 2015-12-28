@@ -38,7 +38,7 @@ def main():
             time =  1 #np.arange(initialTime, total_time + dt, dt)
             
             while time <= total_time:
-                surface.process(time, dt)
+                surface.process(dt)
                 surface.write(file, time * dt)
                 time += dt
         plot = Plot(surface.get_surfaceFile())
