@@ -129,7 +129,7 @@ class surface:
         self.xvals = self.xvals + self.xs * ds
         self.yvals = self.yvals + self.ys * ds
                 
-    def process(self, time=1, timestep=1):
+    def process(self, timestep=1):
         '''    
         Processes the surface depending whether par.ETCHING is set or not.
         
