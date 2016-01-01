@@ -21,7 +21,7 @@ def test_surface():
     surface = Surface()
     print('PRESS ANY KEY TO EXIT THE PLOT')
     for t in arange(1, par.TOTAL_TIME + par.TIME_STEP, par.TIME_STEP):
-        surface.process(t, par.TIME_STEP)
+        surface.process(par.TIME_STEP)
         plt.title('Test Surface{0}'.format(t))
         plt.plot(surface.xvals, surface.yvals, '.r-')
         plt.xlabel('x')
