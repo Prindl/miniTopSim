@@ -12,9 +12,6 @@ module beam.py implements these methods:
 
     get_beam(template)
         calculates the beam at all x positions
-		
-    sigma_by_fwhm()
-        returns the standard deviation calculated by fwhm
 """
 
 '''
