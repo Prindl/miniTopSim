@@ -16,7 +16,6 @@ import beam
 def test_surface():    
     dir_path = os.path.dirname(os.path.abspath(__file__))
     par.init()
-    beam.init()
     par.read(os.path.join(dir_path, 'test_surface.cfg'))
 
     surface = Surface()
